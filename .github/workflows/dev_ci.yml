@@ -3,10 +3,10 @@ name: CI  # this name will show up in the badge
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
     branches:
-      - main
+      - master
 
 env:
   DOCS_DIR: "docs"
