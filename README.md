@@ -1,4 +1,4 @@
-[![CI](https://github.com/andres-fr/pymltemplate2/workflows/CI/badge.svg)](https://github.com/andres-fr/pymltemplate2/actions?query=workflow%3ACI)
+[![CI](https://github.com/andres-fr/python_ml_template/workflows/CI/badge.svg)](https://github.com/andres-fr/python_ml_template/actions?query=workflow%3ACI)
 
 
 # python_ml_template

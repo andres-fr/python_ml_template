@@ -81,13 +81,13 @@ jobs:
         shell: bash
 
 
-      - name: Bump version and push tag
-        uses: anothrNick/github-tag-action@1.26.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          WITH_V: true
-          INITIAL_VERSION: 0.1.0
-          DEFAULT_BUMP: none
+      # - name: Bump version and push tag
+      #   uses: anothrNick/github-tag-action@1.26.0
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     WITH_V: true
+      #     INITIAL_VERSION: 0.1.0
+      #     DEFAULT_BUMP: none
 
       # Upload an artifact of the html docs.
       - name: Upload HTML doc artifact
