@@ -1,4 +1,7 @@
-[![CI](https://github.com/andres-fr/python_ml_template/workflows/CI/badge.svg)](https://github.com/andres-fr/python_ml_template/actions?query=workflow%3ACI) [https://img.shields.io/badge/docs-latest-blue](https://andres-fr.github.io/python_ml_template/)
+[![CI](https://github.com/andres-fr/python_ml_template/workflows/CI/badge.svg)](https://github.com/andres-fr/python_ml_template/actions?query=workflow%3ACI)
+
+
+[![docs badge](https://img.shields.io/badge/docs-latest-blue)](https://andres-fr.github.io/python_ml_template/)
 
 
 # python_ml_template
