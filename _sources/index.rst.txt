@@ -1,0 +1,21 @@
+.. ml_lib documentation master file, created by
+   sphinx-quickstart on Thu Oct 29 22:23:19 2020.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Welcome to ml_lib's documentation!
+==================================
+
+.. toctree::
+   :maxdepth: 4
+   :caption: Contents:
+
+   ml_lib
+
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`

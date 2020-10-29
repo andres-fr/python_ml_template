@@ -1,0 +1,37 @@
+ml\_lib package
+===============
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   ml_lib.nested
+
+Submodules
+----------
+
+ml\_lib.bar\_module module
+--------------------------
+
+.. automodule:: ml_lib.bar_module
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ml\_lib.foo\_module module
+--------------------------
+
+.. automodule:: ml_lib.foo_module
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: ml_lib
+   :members:
+   :undoc-members:
+   :show-inheritance:
