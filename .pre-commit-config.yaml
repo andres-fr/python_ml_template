@@ -1,0 +1,38 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-yaml
+      - id: detect-private-key
+      - id: fix-encoding-pragma
+      - id: check-executables-have-shebangs
+      - id: mixed-line-ending
+      - id: name-tests-test
+        args: ['--django']
+      - id: requirements-txt-fixer
+      # - id:
+      # - id:
+      # - id:
+      # - id:
+      # - id:
+      # - id:
+      # - id:
+      # - id:
+
+  - repo: https://github.com/psf/black
+    rev: 20.8b1
+    hooks:
+      - id: black
+        types: [python]
+  - repo: https://gitlab.com/pycqa/flake8
+    rev: 3.8.4
+    hooks:
+    - id: flake8
+
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: master
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]

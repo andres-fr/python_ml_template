@@ -1,0 +1,11 @@
+# Note that some usual lines have been moved into the CI script.
+# Coverage can then be run e.g. as follows:
+#
+# coverage run --source ml_lib -m unittest
+# coverage report --omit "ml_lib/data/*" --fail-under 60
+
+[report]
+# Regexes for lines to exclude from consideration
+exclude_lines =
+  pragma: no cover
+  raise NotImplementedError

@@ -1,0 +1,8 @@
+# coverage>=4.3.4
+commitizen
+coverage
+pre-commit
+# https://pypi.org/project/requirements-dev.txt/
+sphinx
+sphinx-rtd-theme
+wheel

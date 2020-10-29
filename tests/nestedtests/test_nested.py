@@ -1,0 +1,25 @@
+# -*- coding: utf-8 -*-
+
+
+"""
+Dummy test to exemplify nested test structures. All directories must include
+an empty __init__.py file
+"""
+
+
+import unittest
+from ml_lib.foo_module import Foo
+from ml_lib.bar_module import Bar
+
+
+class QuackTestCaseCpu(unittest.TestCase):
+    """"""
+
+    def test_dummy(self) -> None:
+        """"""
+        f = Foo()
+        b = Bar()
+        f.loop(100)
+        b.loop(3)
+        fb: int = f.get_result() + b.get_result()
+        self.assertEqual(fb, 103)
