@@ -6,7 +6,8 @@ ATM commitizen just supports bumping via config file. Since we want a more
 interactive approach, re-wrote the class with an explicit interface.
 
 VRS=`python -c "from ml_lib import __version__ as v; print(v)"`
-python ci_scripts/commitizen_bump.py -P ml_lib/_metadata.py -v $VRS --dry_run
+python ci_scripts/commitizen_bump.py -P ml_lib/_metadata.py -v $VRS --changelog
+--dry_run
 """
 
 import os
@@ -14,8 +15,9 @@ import argparse
 from packaging.version import Version
 
 #
-from commitizen import bump, git, out
+from commitizen import bump, git, out, cmd, changelog
 from commitizen.commands.bump import Bump
+from commitizen.commands.changelog import Changelog
 from commitizen.cz import registry
 from commitizen.exceptions import (
     BumpCommitFailedError,
@@ -23,9 +25,119 @@ from commitizen.exceptions import (
     DryRunExit,
     ExpectedExit,
     NoCommitsFoundError,
+    NoPatternMapError,
     NoneIncrementExit,
     NotAGitProjectError,
 )
+
+
+def get_commiter(commiter_name):
+    """"""
+    msg_error = (
+        "The committer has not been found in the system.\n\n"
+        f"Try running 'pip install {commiter_name}'\n"
+    )
+    assert commiter_name in registry, msg_error
+    return registry[commiter_name]
+
+
+class ConfiglessChangelog(Changelog):
+    """
+    https://commitizen-tools.github.io/commitizen/
+    customization/#custom-changelog-generator
+
+    https://commitizen-tools.github.io/commitizen/changelog/
+    """
+
+    def __init__(self, commiter_name="cz_conventional_commits"):
+        """"""
+        if not git.is_git_project():
+            raise NotAGitProjectError()
+        self.cz = get_commiter(commiter_name)
+        self.commiter_name = commiter_name
+
+        # self.start_rev = args.get("start_rev")
+        # self.file_name = args.get("file_name") or self.config.settings.get(
+        #     "changelog_file"
+        # )
+        # self.incremental = args["incremental"]
+        # self.dry_run = args["dry_run"]
+        # self.unreleased_version = args["unreleased_version"]
+        # self.change_type_map = (
+        #     self.config.settings.get("change_type_map") or self.cz.change_type_map
+        # )
+
+    def __call__(
+        self,
+        chlog_path,
+        unreleased_version,
+        start_rev=None,
+        incremental=False,
+        dry_run=False,
+        change_type_map=None,
+    ):
+        """
+        :param start_rev: If None, changelog from beginning
+        """
+        # THE FOLLOWING CODE DOESN'T HAVE SIDE EFFECTS TO FILESYS OR GIT:
+        commit_parser = self.cz.commit_parser
+        changelog_pattern = self.cz.changelog_pattern
+        changelog_meta = {}
+        changelog_message_builder_hook = self.cz.changelog_message_builder_hook
+        changelog_hook = self.cz.changelog_hook
+        if not changelog_pattern or not commit_parser:
+            raise NoPatternMapError(
+                f"'{self.commiter_name}' rule doesn't support changelog"
+            )
+        #
+        tags = git.get_tags()
+        if not tags:
+            tags = []
+        #
+        if incremental:
+            changelog_meta = changelog.get_metadata(chlog_path)
+            latest_version = changelog_meta.get("latest_version")
+            if latest_version:
+                start_rev = self._find_incremental_rev(latest_version, tags)
+        #
+        commits = git.get_commits(start=start_rev, args="--author-date-order")
+        if not commits:
+            raise NoCommitsFoundError("No commits found")
+        #
+        tree = changelog.generate_tree_from_commits(
+            commits,
+            tags,
+            commit_parser,
+            changelog_pattern,
+            unreleased_version,
+            change_type_map=change_type_map,
+            changelog_message_builder_hook=changelog_message_builder_hook,
+        )
+        changelog_out = changelog.render_changelog(tree)
+        changelog_out = changelog_out.lstrip("\n")
+        #
+        if dry_run:
+            out.write(changelog_out)
+            raise DryRunExit()
+        #
+        # CHANGES TO FILESYSTEM: WRITE TO CHLOG_PATH (AFTER READING)
+        lines = []
+        if incremental and os.path.isfile(chlog_path):
+            with open(chlog_path, "r") as changelog_file:
+                lines = changelog_file.readlines()
+        #
+        with open(chlog_path, "w") as changelog_file:
+            partial_changelog = None
+            if incremental:
+                new_lines = changelog.incremental_build(
+                    changelog_out, lines, changelog_meta
+                )
+                changelog_out = "".join(new_lines)
+                partial_changelog = changelog_out
+            if changelog_hook:
+                changelog_out = changelog_hook(changelog_out, partial_changelog)
+            changelog_file.write(changelog_out)
+            out.write(f"Wrote changelog to {chlog_path}!\n")
 
 
 class ConfiglessBump(Bump):
@@ -37,16 +149,7 @@ class ConfiglessBump(Bump):
         """"""
         if not git.is_git_project():
             raise NotAGitProjectError()
-        self.cz = self._get_commiter(commiter_name)
-
-    def _get_commiter(self, commiter_name):
-        """"""
-        msg_error = (
-            "The committer has not been found in the system.\n\n"
-            f"Try running 'pip install {commiter_name}'\n"
-        )
-        assert commiter_name in registry, msg_error
-        return registry[commiter_name]
+        self.cz = get_commiter(commiter_name)
 
     def __call__(
         self,
@@ -61,7 +164,7 @@ class ConfiglessBump(Bump):
         check_consistency=True,
         update_files_only=False,
         no_verify=False,
-        # changelog_path=None,
+        changelog_path=None,
     ):
         """
         :param str current_version: Semantic version e.g. '0.1.0'
@@ -119,18 +222,14 @@ class ConfiglessBump(Bump):
                 + f"{version_filepaths}. "
             )
             raise ExpectedExit()
-        # # SIDE EFFECTS TO FILESYSTEM: CREATE CHANGELOG
-        # if self.changelog:
-        #     changelog_cmd = Changelog(
-        #         self.config,
-        #         {
-        #             "unreleased_version": new_tag_version,
-        #             "incremental": True,
-        #             "dry_run": dry_run,
-        #         },
-        #     )
-        #     changelog_cmd()
-        #     c = cmd.run(f"git add {changelog_cmd.file_name}")
+        # SIDE EFFECTS TO FILESYSTEM: CREATE CHANGELOG
+        if changelog_path is not None:
+            try:
+                chlogger = ConfiglessChangelog()
+                chlogger(changelog_path, "0.4.0", incremental=True, dry_run=dry_run)
+                c = cmd.run(f"git add {changelog_path}")
+            except Exception as e:
+                out.write(f"[ERROR] during changelog creation: {e}")
         #
         # SIDE EFFECTS TO GIT: TAG AND COMMIT
         try:
@@ -180,22 +279,18 @@ if __name__ == "__main__":
         action="store_true",
         help="If given, the command will print but not change anything.",
     )
-    # parser.add_argument(
-    #     "--changelog",
-    #     action="store_true",
-    #     help="Generate the changelog for the newest version.",
-    # )
-    # parser.add_argument(
-    #     "--check_consistency",
-    #     action="store_true",
-    #     help="check consistency among versions defined in version files.",
-    # )
-    #
+    parser.add_argument(
+        "--changelog",
+        action="store_true",
+        help="Generate the changelog for the newest version.",
+    )
     args = parser.parse_args()
     #
     VERSION = args.current_version
     V_PATHS = [os.path.normpath(p) for p in args.v_paths]
     DRY_RUN = args.dry_run
+    CHANGELOG = args.changelog
     #
+    chlog_path = "CHANGELOG.md" if CHANGELOG else None
     bumper = ConfiglessBump()
-    bumper(VERSION, V_PATHS, dry_run=DRY_RUN)
+    bumper(VERSION, V_PATHS, dry_run=DRY_RUN, changelog_path=chlog_path)
