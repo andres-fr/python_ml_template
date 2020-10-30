@@ -56,17 +56,6 @@ class ConfiglessChangelog(Changelog):
         self.cz = get_commiter(commiter_name)
         self.commiter_name = commiter_name
 
-        # self.start_rev = args.get("start_rev")
-        # self.file_name = args.get("file_name") or self.config.settings.get(
-        #     "changelog_file"
-        # )
-        # self.incremental = args["incremental"]
-        # self.dry_run = args["dry_run"]
-        # self.unreleased_version = args["unreleased_version"]
-        # self.change_type_map = (
-        #     self.config.settings.get("change_type_map") or self.cz.change_type_map
-        # )
-
     def __call__(
         self,
         chlog_path,
