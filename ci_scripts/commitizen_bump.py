@@ -3,21 +3,20 @@
 
 """
 ATM commitizen just supports bumping via config file. Since we want a more
-interactive approach
+interactive approach, re-wrote the class with an explicit interface.
 
-python ci_scripts/commitizen_bump.py --dry_run --yes --changelog -P ml_lib/_metadata.py -v 0.1.0
+VRS=`python -c "from ml_lib import __version__ as v; print(v)"`
+python ci_scripts/commitizen_bump.py -P ml_lib/_metadata.py -v $VRS --dry_run
 """
 
 import os
 import argparse
 from packaging.version import Version
 
-from commitizen import bump, git, out  # , cmd, factory, git, out
-
-# from commitizen.config import BaseConfig, TomlConfig
+#
+from commitizen import bump, git, out
 from commitizen.commands.bump import Bump
 from commitizen.cz import registry
-
 from commitizen.exceptions import (
     BumpCommitFailedError,
     BumpTagFailedError,
@@ -25,9 +24,7 @@ from commitizen.exceptions import (
     ExpectedExit,
     NoCommitsFoundError,
     NoneIncrementExit,
-    # NoPatternMapError,
     NotAGitProjectError,
-    # NoVersionSpecifiedError,
 )
 
 
@@ -193,42 +190,12 @@ if __name__ == "__main__":
     #     action="store_true",
     #     help="check consistency among versions defined in version files.",
     # )
-
+    #
     args = parser.parse_args()
     #
     VERSION = args.current_version
     V_PATHS = [os.path.normpath(p) for p in args.v_paths]
-    #
     DRY_RUN = args.dry_run
-    # CHANGELOG = args.changelog
-
+    #
     bumper = ConfiglessBump()
     bumper(VERSION, V_PATHS, dry_run=DRY_RUN)
-
-    # metapath = "~/git_work/python_ml_template/ml_lib/_metadata.py"
-    # ConfiglessBump()("0.1.0", [metapath])
-
-    # # CHECK_CONSISTENCY = args.check_consistency
-    # # Update config and args with our custom args
-    # CONFIG = NoFileConfig()
-    # CONFIG._settings["version_files"].extend(V_PATHS)
-    # CONFIG.update({"version": VERSION})
-    # ARGUMENTS = {
-    #     "tag_format": None,
-    #     "prerelease": None,
-    #     "increment": None,
-    #     "bump_message": None,
-    #     "changelog": CHANGELOG,
-    #     "no_verify": False,
-    #     "check_consistency": True,
-    #     # 'name': None,
-    #     # 'debug': False,
-    #     "dry_run": DRY_RUN,
-    #     "files_only": False,
-    #     "yes": YES,  # yes!
-    # }
-
-    # # Run the bump action
-    # # import pdb; pdb.set_trace()
-    # bmp = Bump(config=CONFIG, arguments=ARGUMENTS)
-    # bmp()
