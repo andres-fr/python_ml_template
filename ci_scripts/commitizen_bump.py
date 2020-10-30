@@ -239,8 +239,9 @@ class ConfiglessBump(Bump):
                 check_consistency=check_consistency,
             )
             raise e
-        #
-        c = git.tag(new_tag_version)
+        # same as git.tag
+        tag_msg = "" if changelog_path is None else f"-F {changelog_path}"
+        c = cmd.run(f"git tag {new_tag_version}" + tag_msg)
         if c.return_code != 0:
             raise BumpTagFailedError(c.err)
         out.success("Done!")
