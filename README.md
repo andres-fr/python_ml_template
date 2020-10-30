@@ -40,7 +40,12 @@
 
 ### TODO:
 
-* Tagging still not working. If CI does it all, how is my client expected to update the version? I think I should manually release, and semi-automate it via pre-commit. Rethink process. Also auto-release to Pypi and GH releases. Also where does CHANGELOG go?
+
+* Fix tagging: tags read changelog as a txt, not markdown. So what we actually need is a RELEASE. possible steps?
+  1. Remove the -F message from the tag
+  2. in the CI runner, for tagged runs, create the CHANGELOG and convert the tag into a release?
+  3. Still we need to deploy to pip and conda forge.
+
 * change docstring style to napoleon. add doctest
 * badges
 

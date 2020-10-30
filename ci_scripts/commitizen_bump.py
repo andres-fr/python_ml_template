@@ -241,7 +241,7 @@ class ConfiglessBump(Bump):
             out.write(f"\n[ERROR] Resetting version files to {current_version}")
             raise e
         # same as git.tag
-        tag_msg = "" if changelog_path is None else f"-F {changelog_path}"
+        tag_msg = "" if changelog_path is None else f" -F {changelog_path}"
         import pdb
 
         pdb.set_trace()
