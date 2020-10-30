@@ -19,8 +19,8 @@ increments it upon releases. The other fields can be manually updated
 whenever necessary.
 """
 
-# Version automatically managed. Edit only to set initial value (usually 2.0.0)
-VERSION = "0.1.0"
+# Version automatically managed. Edit only to set initial value
+VERSION = "0.2.0"
 AUTHOR = "aferro"  # multiple authors: enumeration separated by ", "
 EMAIL = "andres.fernandez@surrey.ac.uk"
 LICENSE = "MIT"

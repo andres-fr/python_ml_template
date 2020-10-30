@@ -1,7 +1,6 @@
 [![CI](https://github.com/andres-fr/python_ml_template/workflows/CI/badge.svg)](https://github.com/andres-fr/python_ml_template/actions?query=workflow%3ACI)
-
-
 [![docs badge](https://img.shields.io/badge/docs-latest-blue)](https://andres-fr.github.io/python_ml_template/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 
 # python_ml_template
@@ -10,7 +9,7 @@
 
 * `pip install ???`
 * `pre-commit install --install-hooks -t pre-commit -t commit-msg`
-
+* `git config branch.master.mergeOptions "--squash`
 
 ### Added:
 
@@ -19,8 +18,6 @@
 * flake8
 * __all__
 * using pre-commit, added commitizen to pre-commit (remember to `pre-commit install --install-hooks -t pre-commit -t commit-msg`). This enforces "conventional commits" style: https://www.conventionalcommits.org/en/v1.0.0/#summary To commit, reecommended to `pip install commitizen` and then commit using: `cz c` (or `cz c --retry` if the last one failed).
-
-
 
 * docs from scratch:
   1. Add docs folder and requirements.txt with `sphinx` and `sphinx-rtd-theme`
