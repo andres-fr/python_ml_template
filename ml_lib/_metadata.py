@@ -20,7 +20,7 @@ whenever necessary.
 """
 
 # Version automatically managed. Edit only to set initial value
-VERSION = "0.2.0"
+VERSION = "0.3.0"
 AUTHOR = "aferro"  # multiple authors: enumeration separated by ", "
 EMAIL = "andres.fernandez@surrey.ac.uk"
 LICENSE = "MIT"
