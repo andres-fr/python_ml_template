@@ -10,6 +10,7 @@
 * `pip install ???`
 * `pre-commit install --install-hooks -t pre-commit -t commit-msg`
 * `git config branch.master.mergeOptions "--squash`
+* Activate gh-pages web
 
 ### Added:
 
@@ -37,6 +38,7 @@
 * mypy (not needed in research code)
 * gitignore.io
 * dependabot https://dependabot.com/github-actions/
+* Ignore commits in changelog: https://github.com/conventional-changelog/conventional-changelog/issues/342
 
 ### TODO:
 
