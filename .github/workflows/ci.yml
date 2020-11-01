@@ -59,7 +59,17 @@ jobs:
           python -m pip list
         shell: bash
 
-      - name: Commit lint (commitizen)
+
+
+      - name: DEBUG
+        run: |
+          python ci_scripts/commitizen_changelog.py -o "$CHANGELOG_PATH"
+        shell: bash
+
+
+
+
+      - name: Lint commit (commitizen)
         run: |
           cz check --rev-range HEAD  # ~1..HEAD  # since the runner only seems to have checked out the latest commit
 
@@ -121,7 +131,7 @@ jobs:
           for i in "$DOCS_DIR"/_build/latex/*.pdf; do mv "$i" "${i%.*}_"$VERSION".pdf"; done
         shell: bash
 
-      - name: Create CHANGELOG.md
+      - name: Create changelog
         run: |
           python ci_scripts/commitizen_changelog.py -o "$CHANGELOG_PATH"
         shell: bash

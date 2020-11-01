@@ -170,6 +170,8 @@ if __name__ == "__main__":
     # INCREMENTAL = args.incremental
     DRY_RUN = args.dry_run
     #
+    print(git.get_tags())
+    print(git.get_commits())
     if LAST_VERSION is None:
         sorted_versions = sorted(
             (t.name for t in git.get_tags()), key=lambda elt: Version(elt)
