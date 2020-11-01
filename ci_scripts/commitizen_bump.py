@@ -248,9 +248,6 @@ class ConfiglessBump(Bump):
             raise e
         # same as git.tag
         tag_msg = "" if changelog_path is None else f" -F {changelog_path}"
-        import pdb
-
-        pdb.set_trace()
         c = cmd.run(f"git tag {new_tag_version}" + tag_msg)
         if c.return_code != 0:
             raise BumpTagFailedError(c.err)
