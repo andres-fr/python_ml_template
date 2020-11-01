@@ -17,7 +17,6 @@ env:
   #
   EXCLUDE_FROM_WHEEL: "tests tests.*"  # if you want to include the tests in the wheel set an empty string ""
   INCLUDE_PATHS: "ml_lib/data LICENSE"  # a sequence of paths with non-python data to include in the package
-  TESTS_TIMEOUT_MINUTES: 20
 
 jobs:
 
@@ -31,7 +30,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: [3.6]  #, 3.7, 3.8]
-    timeout-minutes: ${{ env.TESTS_TIMEOUT_MINUTES }}
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v2
       - name: Setup python ${{ matrix.python-version }}
@@ -80,7 +79,6 @@ jobs:
     needs: tests  # Only run if tests succeeded
     strategy:
       fail-fast: false
-    timeout-minutes: ${{ env.TESTS_TIMEOUT_MINUTES }}
     steps:
       - uses: actions/checkout@v2
       - name: Setup python
