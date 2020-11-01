@@ -6,7 +6,7 @@ ATM commitizen just supports bumping via config file. Since we want a more
 interactive approach, re-wrote the class with an explicit interface.
 
 VRS=`python -c "from ml_lib import __version__ as v; print(v)"`
-python ci_scripts/commitizen_bump.py -P ml_lib/_metadata.py -v $VRS --changelog
+python ci_scripts/commitizen_bump.py -P ml_lib/_metadata.py -v $VRS
 --dry_run
 """
 
@@ -15,9 +15,8 @@ import argparse
 from packaging.version import Version
 
 #
-from commitizen import bump, git, out, cmd, changelog
+from commitizen import bump, git, out, cmd
 from commitizen.commands.bump import Bump
-from commitizen.commands.changelog import Changelog
 from commitizen.cz import registry
 from commitizen.exceptions import (
     BumpCommitFailedError,
@@ -25,7 +24,6 @@ from commitizen.exceptions import (
     DryRunExit,
     ExpectedExit,
     NoCommitsFoundError,
-    NoPatternMapError,
     NoneIncrementExit,
     NotAGitProjectError,
 )
@@ -39,94 +37,6 @@ def get_commiter(commiter_name):
     )
     assert commiter_name in registry, msg_error
     return registry[commiter_name]
-
-
-class ConfiglessChangelog(Changelog):
-    """
-    https://commitizen-tools.github.io/commitizen/
-    customization/#custom-changelog-generator
-
-    https://commitizen-tools.github.io/commitizen/changelog/
-    """
-
-    def __init__(self, commiter_name="cz_conventional_commits"):
-        """"""
-        if not git.is_git_project():
-            raise NotAGitProjectError()
-        self.cz = get_commiter(commiter_name)
-        self.commiter_name = commiter_name
-
-    def __call__(
-        self,
-        chlog_path,
-        latest_version,
-        start_rev=None,
-        incremental=False,
-        dry_run=False,
-        change_type_map=None,
-    ):
-        """
-        :param start_rev: If None, changelog from beginning
-        """
-        # THE FOLLOWING CODE DOESN'T HAVE SIDE EFFECTS TO FILESYS OR GIT:
-        commit_parser = self.cz.commit_parser
-        changelog_pattern = self.cz.changelog_pattern
-        changelog_meta = {}
-        changelog_message_builder_hook = self.cz.changelog_message_builder_hook
-        changelog_hook = self.cz.changelog_hook
-        if not changelog_pattern or not commit_parser:
-            raise NoPatternMapError(
-                f"'{self.commiter_name}' rule doesn't support changelog"
-            )
-        #
-        tags = git.get_tags()
-        if not tags:
-            tags = []
-        #
-        if incremental:
-            changelog_meta = changelog.get_metadata(chlog_path)
-            latest_version = changelog_meta.get("latest_version")
-            if latest_version:
-                start_rev = self._find_incremental_rev(latest_version, tags)
-        #
-        commits = git.get_commits(start=start_rev, args="--author-date-order")
-        if not commits:
-            raise NoCommitsFoundError("No commits found")
-        #
-        tree = changelog.generate_tree_from_commits(
-            commits,
-            tags,
-            commit_parser,
-            changelog_pattern,
-            latest_version,
-            change_type_map=change_type_map,
-            changelog_message_builder_hook=changelog_message_builder_hook,
-        )
-        changelog_out = changelog.render_changelog(tree)
-        changelog_out = changelog_out.lstrip("\n")
-        #
-        if dry_run:
-            out.write(changelog_out)
-            raise DryRunExit()
-        #
-        # CHANGES TO FILESYSTEM: WRITE TO CHLOG_PATH (AFTER READING)
-        lines = []
-        if incremental and os.path.isfile(chlog_path):
-            with open(chlog_path, "r") as changelog_file:
-                lines = changelog_file.readlines()
-        #
-        with open(chlog_path, "w") as changelog_file:
-            partial_changelog = None
-            if incremental:
-                new_lines = changelog.incremental_build(
-                    changelog_out, lines, changelog_meta
-                )
-                changelog_out = "".join(new_lines)
-                partial_changelog = changelog_out
-            if changelog_hook:
-                changelog_out = changelog_hook(changelog_out, partial_changelog)
-            changelog_file.write(changelog_out)
-            out.write(f"Wrote changelog to {chlog_path}!\n")
 
 
 class ConfiglessBump(Bump):
@@ -153,13 +63,9 @@ class ConfiglessBump(Bump):
         check_consistency=True,
         update_files_only=False,
         no_verify=False,
-        changelog_path=None,
-        incremental_chlog=False,
     ):
         """
         :param str current_version: Semantic version e.g. '0.1.0'
-        :param str changelog_path: If given, save changelog there
-
         """
         # THE FOLLOWING CODE DOESN'T HAVE SIDE EFFECTS TO FILESYS OR GIT:
         current_version_instance = Version(current_version)
@@ -212,20 +118,6 @@ class ConfiglessBump(Bump):
                 + f"{version_filepaths}. "
             )
             raise ExpectedExit()
-        # SIDE EFFECTS TO FILESYSTEM: CREATE CHANGELOG
-        if changelog_path is not None:
-            try:
-                chlogger = ConfiglessChangelog()
-                chlogger(
-                    changelog_path,
-                    new_version,
-                    incremental=incremental_chlog,
-                    dry_run=dry_run,
-                )
-                c = cmd.run(f"git add {changelog_path}")
-            except Exception as e:
-                out.write(f"[ERROR] during changelog creation: {e}")
-        #
         # SIDE EFFECTS TO GIT: TAG AND COMMIT
         try:
             commit_args = "-a"
@@ -247,7 +139,7 @@ class ConfiglessBump(Bump):
             out.write(f"\n[ERROR] Resetting version files to {current_version}")
             raise e
         # same as git.tag
-        tag_msg = "" if changelog_path is None else f" -F {changelog_path}"
+        tag_msg = ""  # if changelog_path is None else f" -F {changelog_path}"
         c = cmd.run(f"git tag {new_tag_version}" + tag_msg)
         if c.return_code != 0:
             raise BumpTagFailedError(c.err)
@@ -276,31 +168,15 @@ if __name__ == "__main__":
         action="store_true",
         help="If given, the command will print but not change anything.",
     )
-    parser.add_argument(
-        "--changelog",
-        action="store_true",
-        help="Generate the changelog for the newest version.",
-    )
-    parser.add_argument(
-        "--incremental",
-        action="store_true",
-        help="If given, changelog will only contain changes since last tag.",
-    )
-
     args = parser.parse_args()
     #
     VERSION = args.current_version
     V_PATHS = [os.path.normpath(p) for p in args.v_paths]
     DRY_RUN = args.dry_run
-    CHANGELOG = args.changelog
-    INCREMENTAL = args.incremental
     #
-    chlog_path = "CHANGELOG.md" if CHANGELOG else None
     bumper = ConfiglessBump()
     bumper(
         VERSION,
         V_PATHS,
         dry_run=DRY_RUN,
-        changelog_path=chlog_path,
-        incremental_chlog=INCREMENTAL,
     )
