@@ -59,7 +59,7 @@ class ConfiglessChangelog(Changelog):
     def __call__(
         self,
         chlog_path,
-        unreleased_version,
+        latest_version,
         start_rev=None,
         incremental=False,
         dry_run=False,
@@ -98,7 +98,7 @@ class ConfiglessChangelog(Changelog):
             tags,
             commit_parser,
             changelog_pattern,
-            unreleased_version,
+            latest_version,
             change_type_map=change_type_map,
             changelog_message_builder_hook=changelog_message_builder_hook,
         )
@@ -154,6 +154,7 @@ class ConfiglessBump(Bump):
         update_files_only=False,
         no_verify=False,
         changelog_path=None,
+        incremental_chlog=False,
     ):
         """
         :param str current_version: Semantic version e.g. '0.1.0'
@@ -215,7 +216,12 @@ class ConfiglessBump(Bump):
         if changelog_path is not None:
             try:
                 chlogger = ConfiglessChangelog()
-                chlogger(changelog_path, "0.4.0", incremental=True, dry_run=dry_run)
+                chlogger(
+                    changelog_path,
+                    new_version,
+                    incremental=incremental_chlog,
+                    dry_run=dry_run,
+                )
                 c = cmd.run(f"git add {changelog_path}")
             except Exception as e:
                 out.write(f"[ERROR] during changelog creation: {e}")
@@ -278,13 +284,26 @@ if __name__ == "__main__":
         action="store_true",
         help="Generate the changelog for the newest version.",
     )
+    parser.add_argument(
+        "--incremental",
+        action="store_true",
+        help="If given, changelog will only contain changes since last tag.",
+    )
+
     args = parser.parse_args()
     #
     VERSION = args.current_version
     V_PATHS = [os.path.normpath(p) for p in args.v_paths]
     DRY_RUN = args.dry_run
     CHANGELOG = args.changelog
+    INCREMENTAL = args.incremental
     #
     chlog_path = "CHANGELOG.md" if CHANGELOG else None
     bumper = ConfiglessBump()
-    bumper(VERSION, V_PATHS, dry_run=DRY_RUN, changelog_path=chlog_path)
+    bumper(
+        VERSION,
+        V_PATHS,
+        dry_run=DRY_RUN,
+        changelog_path=chlog_path,
+        incremental_chlog=INCREMENTAL,
+    )
