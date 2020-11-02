@@ -135,7 +135,7 @@ jobs:
         with:
           body_path: ${{ env.CHANGELOG_PATH }}
           files: |
-            ${{ env.DOCS_DIR }}/_build/html
+            ${{ env.DOCS_DIR }}/_build/html/*
             ${{ env.DOCS_DIR }}/_build/latex/*.pdf
             dist/${{ env.LIB_NAME }}*.whl
             # dist/${{ env.LIB_NAME }}*.tar.gz
@@ -143,7 +143,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Publish built docs to gh-pages branch
-      - name: latest docs online
+      - name: publish docs to GH pages
         # if: ${{ !github.event.repository.private }}  # do if repo is not private
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
