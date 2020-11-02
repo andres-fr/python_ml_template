@@ -170,12 +170,10 @@ if __name__ == "__main__":
     # INCREMENTAL = args.incremental
     DRY_RUN = args.dry_run
     #
-    print(git.get_tags())
-    print(git.get_commits())
     if LAST_VERSION is None:
-        sorted_versions = sorted(
-            (t.name for t in git.get_tags()), key=lambda elt: Version(elt)
-        )
+        gtags = git.get_tags()
+        assert gtags, "Changelog not possible because no git tags found!"
+        sorted_versions = sorted((t.name for t in gtags), key=lambda elt: Version(elt))
         LAST_VERSION = sorted_versions[-1]
     #
     chlogger = ConfiglessChangelog()
