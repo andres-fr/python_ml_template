@@ -129,53 +129,25 @@ jobs:
           python ci_scripts/commitizen_changelog.py -o "$CHANGELOG_PATH"
         shell: bash
 
-
-      # # Upload an artifact of the html docs.
-      # - name: Upload HTML doc artifact
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: Documentation-HTML
-      #     path: ${{ env.DOCS_DIR }}/_build/html/
-      # # Upload an artifact of the latexpdf docs.
-      # - name: Upload PDF doc artifact
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: Documentation-PDF
-      #     path: ${{ env.DOCS_DIR }}/_build/latex/*.pdf
-      # # Upload an artifact of the library wheel.
-      # - name: Upload Python wheel artifact
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: Wheel release for ${{ env.LIB_NAME }}
-      #     path: dist/${{ env.LIB_NAME }}*.whl
-
-      # # Upload an artifact of the library sdist.
-      # - name: Upload Python sdist artifact
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: Sdist release for ${{ env.LIB_NAME }}
-      #     path: dist/${{ env.LIB_NAME }}*.tar.gz
-
-
       - name: Release package to GH
         uses: softprops/action-gh-release@v1
         # if: startsWith(github.ref, 'refs/tags/')  # ONLY IN TAGGED EVENTS
         with:
           body_path: ${{ env.CHANGELOG_PATH }}
           files: |
-            ${{ env.DOCS_DIR }}/_build/html/
+            ${{ env.DOCS_DIR }}/_build/html
             ${{ env.DOCS_DIR }}/_build/latex/*.pdf
             dist/${{ env.LIB_NAME }}*.whl
+            # dist/${{ env.LIB_NAME }}*.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-
-      # # Publish built docs to gh-pages branch
-      # - name: latest docs online
-      #   # if: ${{ !github.event.repository.private }}  # do if repo is not private
-      #   uses: JamesIves/github-pages-deploy-action@3.7.1
-      #   with:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     BRANCH: gh-pages
-      #     FOLDER: ${{ env.DOCS_DIR }}/_build/html # The folder the action should deploy.
-      #     CLEAN: true # Automatically remove deleted files from the deploy branch
+      # Publish built docs to gh-pages branch
+      - name: latest docs online
+        # if: ${{ !github.event.repository.private }}  # do if repo is not private
+        uses: JamesIves/github-pages-deploy-action@3.7.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: ${{ env.DOCS_DIR }}/_build/html # The folder the action should deploy.
+          CLEAN: true # Automatically remove deleted files from the deploy branch

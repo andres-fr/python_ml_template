@@ -50,6 +50,7 @@
 
 * change docstring style to napoleon. add doctest
 * badges
+* Follow-tags not following tags??
 
 1. Once tags fixed, start clean repo without other contribs
 2. CML+ Complete ML project
