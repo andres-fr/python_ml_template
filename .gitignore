@@ -1,7 +1,7 @@
 # PROJECT-SPECIFIC:
 # ignore CHANGELOG to prevent inconsistencies. Logs should be found online with each release, and can anyway be generated locally at will using e.g. commitizen
 CHANGELOG.md
-
+docs
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

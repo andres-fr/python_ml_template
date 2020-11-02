@@ -122,6 +122,7 @@ jobs:
           AUTHOR=`python -c "from ${LIB_NAME} import __author__ as a; print(a)"`
           python ci_scripts/sphinx_docs.py -p "$LIB_NAME"/ -a "$AUTHOR" -v "$VERSION" -o "$DOCS_DIR" -H -L -Y
           for i in "$DOCS_DIR"/_build/latex/*.pdf; do mv "$i" "${i%.*}_"$VERSION".pdf"; done
+          zip -r "$DOCS_DIR"/html_docs_"$VERSION".zip "$DOCS_DIR"/_build/html
         shell: bash
 
       - name: Create changelog
@@ -135,12 +136,17 @@ jobs:
         with:
           body_path: ${{ env.CHANGELOG_PATH }}
           files: |
-            ${{ env.DOCS_DIR }}/_build/html/*
+            ${{ env.DOCS_DIR }}/html_docs.zip
             ${{ env.DOCS_DIR }}/_build/latex/*.pdf
             dist/${{ env.LIB_NAME }}*.whl
             # dist/${{ env.LIB_NAME }}*.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish package to PyPI
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          password: ${{ secrets.pypi}}
 
       # Publish built docs to gh-pages branch
       - name: publish docs to GH pages

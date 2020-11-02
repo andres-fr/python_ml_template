@@ -28,6 +28,8 @@
 
 * GH pages action. Make sure that the repo server has publishing enabled, otherwise it will error.
 
+* Pypi: need a regular and a test account. Create a token for GH actions (if global only need to do this once). Then, in the GH repo, add that token under secrets->pypi. https://pypi.org/manage/account/token/
+
 
 ### Ignored for the moment:
 * TUT __init__ check_installation
