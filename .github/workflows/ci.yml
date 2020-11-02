@@ -64,8 +64,9 @@ jobs:
         shell: bash
 
 
-      - name: Create changelog
+      - name: DEBUG
         run: |
+          echo ${{ github.ref }}
           python ci_scripts/commitizen_changelog.py -o "$CHANGELOG_PATH"
         shell: bash
 
