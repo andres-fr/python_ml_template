@@ -20,6 +20,7 @@ env:
   DOCS_DIR: "docs"
   LIB_NAME: "ml_lib"
   VERSION_FILE: "_metadata.py"  # inside LIB_NAME
+  PACKAGE_NAME: "aferro_ml_lib"  # usually same as lib_name, unless same name already exists in PyPI
   #
   COVERAGE_REPORT_FLAGS: "--omit ml_lib/data --fail-under 60"
   #
@@ -113,7 +114,7 @@ jobs:
 
       - name: Build package
         run: |
-          python setup.py sdist bdist_wheel -p "$LIB_NAME"/ -m "$LIB_NAME"/"$VERSION_FILE" -E `echo "$EXCLUDE_FROM_WHEEL"` -I `echo "$INCLUDE_PATHS"`
+          python setup.py sdist bdist_wheel -p "$PACKAGE_NAME" -m "$LIB_NAME"/"$VERSION_FILE" -E `echo "$EXCLUDE_FROM_WHEEL"` -I `echo "$INCLUDE_PATHS"`
 
       # version is picked automatically from the bumpversion file
       - name: Build sphinx docs
@@ -136,7 +137,7 @@ jobs:
         with:
           body_path: ${{ env.CHANGELOG_PATH }}
           files: |
-            ${{ env.DOCS_DIR }}/html_docs.zip
+            ${{ env.DOCS_DIR }}/html_docs_*.zip
             ${{ env.DOCS_DIR }}/_build/latex/*.pdf
             dist/${{ env.LIB_NAME }}*.whl
             # dist/${{ env.LIB_NAME }}*.tar.gz
@@ -146,6 +147,7 @@ jobs:
       - name: Publish package to PyPI
         uses: pypa/gh-action-pypi-publish@master
         with:
+          verbose: true
           password: ${{ secrets.pypi}}
 
       # Publish built docs to gh-pages branch

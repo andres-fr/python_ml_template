@@ -66,6 +66,7 @@ parser.add_argument(
     required=True,
     help="Name of the Python library to be packaged. Must be in same directory",
 )
+
 parser.add_argument(
     "-m",
     "--metadata_path",
@@ -93,7 +94,7 @@ parser.add_argument(
 args, unknown_args = parser.parse_known_args()
 sys.argv = sys.argv[0:1] + unknown_args  # pass the remaining args to setup
 #
-PACKAGE_NAME = os.path.basename(os.path.normpath(args.package_name))
+PACKAGE_NAME = args.package_name
 METADATA_PATH = os.path.normpath(args.metadata_path)
 EXTRA_FILES = sum([get_files_recursive(f) for f in args.include_files], [])
 EXCLUDE_PACKAGES = args.exclude_packages
