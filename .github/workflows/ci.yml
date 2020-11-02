@@ -40,6 +40,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # deep fetch in order to make changelog
       - name: Setup python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
@@ -60,6 +62,13 @@ jobs:
           pip --version
           python -m pip list
         shell: bash
+
+
+      - name: Create changelog
+        run: |
+          python ci_scripts/commitizen_changelog.py -o "$CHANGELOG_PATH"
+        shell: bash
+
 
       - name: Lint commit (commitizen)
         run: |
@@ -87,13 +96,13 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # deep fetch in order to make changelog
       - name: Setup python
         uses: actions/setup-python@v2
         with:
-          fetch-depth: 0  # deep fetch in order to make changelog
           python-version: 3.6
           architecture: x64
-
       - name: Install OS dependencies
         run: |
           sudo apt-get update -y
