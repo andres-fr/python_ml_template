@@ -1,18 +1,23 @@
 [![CI](https://github.com/andres-fr/python_ml_template/workflows/CI/badge.svg)](https://github.com/andres-fr/python_ml_template/actions?query=workflow%3ACI)
 [![docs badge](https://img.shields.io/badge/docs-latest-blue)](https://andres-fr.github.io/python_ml_template/)
+[![PyPI version](https://badge.fury.io/py/aferro-ml-lib.svg)](https://badge.fury.io/py/aferro-ml-lib)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 
 # python_ml_template
 
-### Install actions:
+### First actions:
 
-* `pip install ???`
+When setting up the repo (and potentially also the venv) from scratch, a few one-time actions are needed:
+
+* install pip dependencies
 * `pre-commit install --install-hooks -t pre-commit -t commit-msg`
 * `git config branch.master.mergeOptions "--squash`
-* Activate gh-pages web
+* Activate gh-pages web (otherwise the CI release will error here).
 
-### Added:
+### Features:
+
+The following things are already integrated via CI, but can be run manually:
 
 * Utest: python -m unittest
 * utest with py coverage: coverage run -m unittest
@@ -28,10 +33,11 @@
 
 * GH pages action. Make sure that the repo server has publishing enabled, otherwise it will error.
 
-* Pypi: need a regular and a test account. Create a token for GH actions (if global only need to do this once). Then, in the GH repo, add that token under secrets->pypi. https://pypi.org/manage/account/token/
+* PyPI: need a regular and a test account. Create a token for GH actions (if global only need to do this once). Then, in the GH repo, add that token under secrets->pypi. https://pypi.org/manage/account/token/
 
 
-### Ignored for the moment:
+### Further feature ideas/TODOs:
+
 * TUT __init__ check_installation
 * autoimports in each __init__
 * dcase test tools
@@ -41,19 +47,15 @@
 * gitignore.io
 * dependabot https://dependabot.com/github-actions/
 * Ignore commits in changelog: https://github.com/conventional-changelog/conventional-changelog/issues/342
+* Deploy to conda-forge
+* change docstring style to napoleon
+* add doctest
+* Add changelog to autodocs
+* Integrate wiki. Add wiki to autodocs
+* Autocomment: https://github.com/marketplace/actions/label-commenter
 
 ### TODO:
 
 
-* Fix tagging: tags read changelog as a txt, not markdown. So what we actually need is a RELEASE. possible steps?
-  1. Remove the -F message from the tag
-  2. in the CI runner, for tagged runs, create the CHANGELOG and convert the tag into a release?
-  3. Still we need to deploy to pip and conda forge.
-
-* change docstring style to napoleon. add doctest
-* badges
-* Follow-tags not following tags??
-
-1. Once tags fixed, start clean repo without other contribs
 2. CML+ Complete ML project
 3. Generalize runner to GPU, home and GitLab

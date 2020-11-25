@@ -29,9 +29,7 @@ env:
   CHANGELOG_PATH: "CHANGELOG.md"  # temporary file created in release job
 jobs:
 
-
-
-
+  # ########################################
   test:
     name: "Lint, utest, coverage"
     runs-on: ubuntu-latest
@@ -79,7 +77,7 @@ jobs:
           coverage report `echo $COVERAGE_REPORT_FLAGS`
 
 
-
+  # ########################################
   release:
     name: "build (and optionally release)"
     runs-on: ubuntu-latest
@@ -139,8 +137,8 @@ jobs:
           files: |
             ${{ env.DOCS_DIR }}/html_docs_*.zip
             ${{ env.DOCS_DIR }}/_build/latex/*.pdf
-            dist/${{ env.LIB_NAME }}*.whl
-            # dist/${{ env.LIB_NAME }}*.tar.gz
+            dist/*.whl
+            # dist/*.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
